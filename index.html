@@ -1,0 +1,67 @@
+import gradio as gr
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from diffusers import StableDiffusionPipeline
+
+class AICompanion:
+  def __init__(self):
+    # Chat model setup
+    self.tokenizer = AutoTokenizer.from_pretrained("microsoft/DialoGPT-medium")
+    self.chat_model = AutoModelForCausalLM.from_pretrained("microsoft/DialoGPT-medium")
+
+    # Image generation setup
+    self.image_generator = StableDiffusionPipeline.from_pretrained(
+      "runwayml/stable-diffusion-v1-5", 
+      torch_dtype=torch.float16
+    ).to("cpu")
+
+  def chat(self, message, history):
+    # Convert history to input format
+    input_ids = self.tokenizer.encode(message + self.tokenizer.eos_token, return_tensors="pt")
+    
+    # Generate response
+    output = self.chat_model.generate(input_ids, max_length=1000)
+    response = self.tokenizer.decode(output[0], skip_special_tokens=True)
+    
+    return response
+
+  def generate_image(self, prompt):
+    # Generate image from text prompt
+    image = self.image_generator(prompt).images[0]
+    
+    # Save generated image
+    image_path = "generated_image.png"
+    image.save(image_path)
+    
+    return image_path
+
+# Create AI Companion instance
+ai_companion = AICompanion()
+
+# Gradio Interface
+with gr.Blocks() as demo:
+    gr.Markdown("# 🤖 AI Companion: Chat & Create")
+    
+    with gr.Tab("Chat"):
+        chatbot = gr.Chatbot()
+        msg = gr.Textbox(label="Your Message")
+        submit = gr.Button("Send")
+        
+        submit.click(
+          ai_companion.chat, 
+          inputs=[msg, chatbot], 
+          outputs=[chatbot]
+        )
+
+    with gr.Tab("Image Generation"):
+        image_prompt = gr.Textbox(label="Describe the image you want to create")
+        generate_btn = gr.Button("Generate Image")
+        output_image = gr.Image()
+        
+        generate_btn.click(
+          ai_companion.generate_image, 
+          inputs=[image_prompt], 
+          outputs=[output_image]
+        )
+
+demo.launch(share=True)
