@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate AI Chatbot</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tensorflow/4.2.0/tf.min.js"></script>
+    <title>AI Chatbot - Groq Powered</title>
     <style>
         * {
             margin: 0;
@@ -15,21 +14,21 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             height: 100vh;
-            background: linear-gradient(135deg, #0a0e27 0%, #1a0e2e 50%, #2d1b69 100%);
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #581c87 100%);
             display: flex;
             flex-direction: column;
             overflow: hidden;
         }
 
         .header {
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(168, 85, 247, 0.3);
+            border-bottom: 1px solid rgba(139, 92, 246, 0.3);
             padding: 1rem;
         }
 
         .header-content {
-            max-width: 1200px;
+            max-width: 1024px;
             margin: 0 auto;
             display: flex;
             align-items: center;
@@ -45,29 +44,20 @@
         .bot-icon {
             width: 45px;
             height: 45px;
-            background: linear-gradient(135deg, #a855f7 0%, #ec4899 50%, #f59e0b 100%);
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 26px;
-            box-shadow: 0 4px 20px rgba(168, 85, 247, 0.6);
-            animation: pulse 3s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 4px 20px rgba(168, 85, 247, 0.6); }
-            50% { box-shadow: 0 4px 30px rgba(236, 72, 153, 0.8); }
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.5);
         }
 
         .header-text h1 {
             color: white;
-            font-size: 1.3rem;
+            font-size: 1.25rem;
             font-weight: bold;
-            background: linear-gradient(135deg, #a855f7 0%, #ec4899 50%, #f59e0b 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
         }
 
         .header-text p {
@@ -75,20 +65,81 @@
             font-size: 0.875rem;
         }
 
-        .capabilities {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
+        .settings-btn {
+            background: rgba(139, 92, 246, 0.2);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            color: #c4b5fd;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
         }
 
-        .capability-badge {
-            background: rgba(168, 85, 247, 0.2);
-            border: 1px solid rgba(168, 85, 247, 0.4);
-            color: #c4b5fd;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 500;
+        .settings-btn:hover {
+            background: rgba(139, 92, 246, 0.3);
+        }
+
+        .settings-panel {
+            display: none;
+            background: rgba(251, 191, 36, 0.1);
+            border-bottom: 1px solid rgba(251, 191, 36, 0.3);
+            padding: 1rem;
+        }
+
+        .settings-panel.active {
+            display: block;
+        }
+
+        .settings-content {
+            max-width: 1024px;
+            margin: 0 auto;
+        }
+
+        .settings-content h3 {
+            color: #fbbf24;
+            margin-bottom: 0.5rem;
+        }
+
+        .settings-content p {
+            color: #fde68a;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .settings-content a {
+            color: #fbbf24;
+            text-decoration: underline;
+        }
+
+        .api-input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .api-input-group input {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            color: white;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            outline: none;
+        }
+
+        .api-input-group button {
+            background: #f59e0b;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .api-input-group button:hover {
+            background: #d97706;
         }
 
         .messages-container {
@@ -98,7 +149,7 @@
         }
 
         .messages {
-            max-width: 1200px;
+            max-width: 1024px;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
@@ -137,7 +188,7 @@
         }
 
         .message.assistant .message-icon {
-            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
         }
 
         .message-content {
@@ -146,46 +197,30 @@
             border-radius: 1.25rem;
             word-wrap: break-word;
             line-height: 1.6;
+            white-space: pre-wrap;
         }
 
         .message.user .message-content {
             background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
             color: white;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
 
         .message.assistant .message-content {
-            background: rgba(168, 85, 247, 0.15);
+            background: rgba(139, 92, 246, 0.15);
             backdrop-filter: blur(10px);
             color: white;
-            border: 1px solid rgba(168, 85, 247, 0.3);
-        }
-
-        .message-meta {
-            font-size: 0.75rem;
-            color: #a78bfa;
-            margin-top: 0.5rem;
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .meta-tag {
-            background: rgba(168, 85, 247, 0.2);
-            padding: 0.125rem 0.5rem;
-            border-radius: 0.25rem;
+            border: 1px solid rgba(139, 92, 246, 0.3);
         }
 
         .typing {
             display: inline-flex;
             gap: 4px;
-            align-items: center;
         }
 
         .typing span {
             width: 8px;
             height: 8px;
-            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
             border-radius: 50%;
             animation: bounce 1.4s infinite ease-in-out;
         }
@@ -199,25 +234,23 @@
         }
 
         .input-container {
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(10px);
-            border-top: 1px solid rgba(168, 85, 247, 0.3);
+            border-top: 1px solid rgba(139, 92, 246, 0.3);
             padding: 1rem;
         }
 
         .input-wrapper {
-            max-width: 1200px;
+            max-width: 1024px;
             margin: 0 auto;
             display: flex;
             gap: 0.5rem;
-            align-items: center;
         }
 
         #messageInput {
             flex: 1;
-            background: rgba(168, 85, 247, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(168, 85, 247, 0.3);
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.3);
             border-radius: 9999px;
             padding: 0.875rem 1.5rem;
             color: white;
@@ -230,37 +263,12 @@
         }
 
         #messageInput:focus {
-            border-color: #a855f7;
-            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2);
-        }
-
-        .button-group {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .action-button {
-            background: rgba(168, 85, 247, 0.2);
-            border: 1px solid rgba(168, 85, 247, 0.4);
-            border-radius: 50%;
-            width: 44px;
-            height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #c4b5fd;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 1.25rem;
-        }
-
-        .action-button:hover {
-            background: rgba(168, 85, 247, 0.3);
-            transform: scale(1.05);
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
         }
 
         #sendButton {
-            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
             border: none;
             border-radius: 50%;
             width: 48px;
@@ -271,17 +279,15 @@
             color: white;
             cursor: pointer;
             transition: transform 0.2s;
-            box-shadow: 0 4px 12px rgba(168, 85, 247, 0.4);
         }
 
         #sendButton:hover:not(:disabled) {
-            transform: scale(1.1);
+            transform: scale(1.05);
         }
 
         #sendButton:disabled {
             background: #4b5563;
             cursor: not-allowed;
-            box-shadow: none;
         }
     </style>
 </head>
@@ -289,35 +295,38 @@
     <div class="header">
         <div class="header-content">
             <div class="header-left">
-                <div class="bot-icon">🧠</div>
+                <div class="bot-icon">⚡</div>
                 <div class="header-text">
-                    <h1>Ultimate AI Chatbot</h1>
-                    <p>ML + Web Search + Wikipedia + Learning</p>
+                    <h1>AI Chatbot</h1>
+                    <p>Powered by Groq (Fast & Free!)</p>
                 </div>
             </div>
-            <div class="capabilities">
-                <div class="capability-badge">🔍 Web Search</div>
-                <div class="capability-badge">📚 Wikipedia</div>
-                <div class="capability-badge">🧠 ML Powered</div>
-                <div class="capability-badge">💾 Memory</div>
+            <button class="settings-btn" onclick="toggleSettings()">⚙️ API Key</button>
+        </div>
+    </div>
+
+    <div class="settings-panel" id="settingsPanel">
+        <div class="settings-content">
+            <h3>⚡ Get Your Free Groq API Key</h3>
+            <p>
+                1. Go to <a href="https://console.groq.com" target="_blank">console.groq.com</a><br>
+                2. Sign up for free (no credit card needed!)<br>
+                3. Create an API key<br>
+                4. Paste it below
+            </p>
+            <div class="api-input-group">
+                <input type="password" id="apiKeyInput" placeholder="Enter your Groq API key (starts with gsk_...)">
+                <button onclick="saveApiKey()">Save & Start</button>
             </div>
+            <p style="font-size: 0.75rem; margin-top: 0.5rem;">Your API key is stored locally in your browser only.</p>
         </div>
     </div>
 
     <div class="messages-container" id="messagesContainer">
         <div class="messages" id="messages">
             <div class="message assistant">
-                <div class="message-icon">🧠</div>
-                <div class="message-content">
-                    Hello! I'm your ultimate AI assistant with superpowers:
-                    <br><br>
-                    🔍 <strong>Web Search</strong> - I can search the internet for current information
-                    <br>📚 <strong>Wikipedia</strong> - I fetch knowledge from Wikipedia articles
-                    <br>🧠 <strong>ML Analysis</strong> - I use neural networks to understand your sentiment
-                    <br>💾 <strong>Learning</strong> - I remember our conversations and learn from them
-                    <br><br>
-                    Try asking me about current events, historical facts, or just chat with me!
-                </div>
+                <div class="message-icon">⚡</div>
+                <div class="message-content">Hello! I'm powered by Groq's lightning-fast AI. Click the "⚙️ API Key" button above to get started with your free API key from console.groq.com. No credit card required!</div>
             </div>
         </div>
     </div>
@@ -327,19 +336,15 @@
             <input 
                 type="text" 
                 id="messageInput" 
-                placeholder="Ask me anything..."
+                placeholder="Type your message..."
                 autocomplete="off"
             >
-            <div class="button-group">
-                <button class="action-button" id="wikiButton" title="Search Wikipedia">📚</button>
-                <button class="action-button" id="webButton" title="Web Search">🔍</button>
-                <button id="sendButton">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="22" y1="2" x2="11" y2="13"></line>
-                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                    </svg>
-                </button>
-            </div>
+            <button id="sendButton">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
         </div>
     </div>
 
@@ -348,225 +353,38 @@
         const messagesDiv = document.getElementById('messages');
         const messageInput = document.getElementById('messageInput');
         const sendButton = document.getElementById('sendButton');
-        const wikiButton = document.getElementById('wikiButton');
-        const webButton = document.getElementById('webButton');
+        const apiKeyInput = document.getElementById('apiKeyInput');
+        const settingsPanel = document.getElementById('settingsPanel');
 
         let isLoading = false;
-        let model = null;
+        let apiKey = '';
         let conversationHistory = [];
-        let learnedTopics = {};
-        let userPreferences = {};
 
-        // Initialize ML model
-        async function createSentimentModel() {
-            model = tf.sequential({
-                layers: [
-                    tf.layers.dense({ inputShape: [10], units: 16, activation: 'relu' }),
-                    tf.layers.dropout({ rate: 0.2 }),
-                    tf.layers.dense({ units: 8, activation: 'relu' }),
-                    tf.layers.dense({ units: 3, activation: 'softmax' })
-                ]
-            });
-
-            model.compile({
-                optimizer: tf.train.adam(0.001),
-                loss: 'categoricalCrossentropy',
-                metrics: ['accuracy']
-            });
-            
-            return model;
+        function toggleSettings() {
+            settingsPanel.classList.toggle('active');
         }
 
-        function extractFeatures(text) {
-            const lower = text.toLowerCase();
-            const positiveWords = ['good', 'great', 'happy', 'love', 'excellent', 'amazing', 'wonderful', 'fantastic', 'awesome', 'nice'];
-            const negativeWords = ['bad', 'sad', 'hate', 'terrible', 'awful', 'horrible', 'worst', 'angry', 'disappointed'];
-            const questionWords = ['what', 'why', 'how', 'when', 'where', 'who', 'which'];
-            
-            return [
-                text.length / 100,
-                (text.match(/!/g) || []).length / 5,
-                (text.match(/\?/g) || []).length / 3,
-                positiveWords.filter(w => lower.includes(w)).length / 3,
-                negativeWords.filter(w => lower.includes(w)).length / 3,
-                questionWords.filter(w => lower.includes(w)).length / 3,
-                (text.match(/[A-Z]/g) || []).length / text.length,
-                lower.includes('thank') ? 1 : 0,
-                lower.includes('please') ? 1 : 0,
-                text.split(' ').length / 20
-            ];
-        }
-
-        async function predictSentiment(text) {
-            if (!model) return 1;
-            const features = extractFeatures(text);
-            const tensor = tf.tensor2d([features]);
-            const prediction = model.predict(tensor);
-            const values = await prediction.data();
-            tensor.dispose();
-            prediction.dispose();
-            return values.indexOf(Math.max(...values));
-        }
-
-        async function searchWikipedia(query) {
-            try {
-                const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&format=json&origin=*`;
-                const searchResponse = await fetch(searchUrl);
-                const searchData = await searchResponse.json();
-                
-                if (searchData.query.search.length === 0) {
-                    return null;
-                }
-                
-                const pageTitle = searchData.query.search[0].title;
-                const contentUrl = `https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro&explaintext&titles=${encodeURIComponent(pageTitle)}&format=json&origin=*`;
-                const contentResponse = await fetch(contentUrl);
-                const contentData = await contentResponse.json();
-                
-                const pages = contentData.query.pages;
-                const pageId = Object.keys(pages)[0];
-                const extract = pages[pageId].extract;
-                
-                return {
-                    title: pageTitle,
-                    summary: extract.substring(0, 500) + '...',
-                    url: `https://en.wikipedia.org/wiki/${encodeURIComponent(pageTitle)}`
-                };
-            } catch (error) {
-                console.error('Wikipedia error:', error);
-                return null;
+        function saveApiKey() {
+            apiKey = apiKeyInput.value.trim();
+            if (apiKey) {
+                settingsPanel.classList.remove('active');
+                addMessage('assistant', 'Great! Your API key is saved. Now you can chat with me using Groq\'s powerful AI models. Ask me anything!');
+            } else {
+                alert('Please enter a valid API key');
             }
         }
 
-        function learnFromConversation(userMessage, topic) {
-            if (!learnedTopics[topic]) {
-                learnedTopics[topic] = [];
-            }
-            learnedTopics[topic].push({
-                message: userMessage,
-                timestamp: new Date().toISOString()
-            });
-        }
-
-        function detectTopic(message) {
-            const lower = message.toLowerCase();
-            const topics = {
-                'technology': ['code', 'programming', 'computer', 'software', 'ai', 'tech', 'internet'],
-                'science': ['science', 'physics', 'chemistry', 'biology', 'research', 'study'],
-                'history': ['history', 'historical', 'ancient', 'war', 'civilization'],
-                'geography': ['country', 'city', 'continent', 'ocean', 'mountain', 'river'],
-                'entertainment': ['movie', 'music', 'game', 'sport', 'film', 'show']
-            };
-            
-            for (let topic in topics) {
-                if (topics[topic].some(keyword => lower.includes(keyword))) {
-                    return topic;
-                }
-            }
-            return 'general';
-        }
-
-        function generateResponse(message, sentiment, wikiData = null) {
-            const lower = message.toLowerCase();
-            
-            if (wikiData) {
-                return `According to Wikipedia: ${wikiData.summary}\n\nRead more: ${wikiData.url}`;
-            }
-            
-            if (lower.match(/^(hi|hello|hey)/)) {
-                const learned = Object.keys(learnedTopics).length;
-                if (learned > 0) {
-                    return `Hello! I've learned about ${learned} topics from our conversations. What would you like to explore today?`;
-                }
-                return "Hello! I'm ready to search, learn, and chat with you!";
-            }
-            
-            const mathMatch = message.match(/(\d+)\s*([\+\-\*\/]|plus|minus|times|divided by)\s*(\d+)/i);
-            if (mathMatch) {
-                let num1 = parseInt(mathMatch[1]);
-                let num2 = parseInt(mathMatch[3]);
-                let op = mathMatch[2];
-                let result;
-                
-                if (op === '+' || op === 'plus') result = num1 + num2;
-                else if (op === '-' || op === 'minus') result = num1 - num2;
-                else if (op === '*' || op === 'times') result = num1 * num2;
-                else if (op === '/' || op === 'divided by') result = num2 !== 0 ? (num1 / num2).toFixed(2) : 'undefined';
-                
-                return `I calculated: ${result}`;
-            }
-            
-            if (lower.includes('what have') && lower.includes('learned')) {
-                const topics = Object.keys(learnedTopics);
-                if (topics.length === 0) {
-                    return "I'm still learning! Keep chatting with me and I'll remember our conversations.";
-                }
-                return `I've learned about these topics from you: ${topics.join(', ')}. I remember ${conversationHistory.length} messages total!`;
-            }
-            
-            if (lower.includes('remember') && conversationHistory.length > 2) {
-                const recentTopics = conversationHistory.slice(-5).map(h => h.topic).filter((v, i, a) => a.indexOf(v) === i);
-                return `Yes! We recently discussed: ${recentTopics.join(', ')}. What else would you like to talk about?`;
-            }
-            
-            const sentimentResponses = {
-                0: [
-                    "That's great! Your positive energy is wonderful. How can I help you further?",
-                    "I love your enthusiasm! What else would you like to explore?"
-                ],
-                1: [
-                    "I understand. Would you like me to search for more information on this topic?",
-                    "Interesting! I can look that up on Wikipedia or the web if you'd like."
-                ],
-                2: [
-                    "I sense some frustration. How can I help make this better?",
-                    "I'm here to help. Would you like me to search for solutions?"
-                ]
-            };
-            
-            return sentimentResponses[sentiment][Math.floor(Math.random() * 2)];
-        }
-
-        function addMessage(role, content, metadata = {}) {
+        function addMessage(role, content) {
             const messageDiv = document.createElement('div');
             messageDiv.className = 'message ' + role;
             
             const icon = document.createElement('div');
             icon.className = 'message-icon';
-            icon.textContent = role === 'user' ? '👤' : '🧠';
+            icon.textContent = role === 'user' ? '👤' : '⚡';
             
             const contentDiv = document.createElement('div');
             contentDiv.className = 'message-content';
             contentDiv.textContent = content;
-            
-            if (Object.keys(metadata).length > 0) {
-                const metaDiv = document.createElement('div');
-                metaDiv.className = 'message-meta';
-                
-                if (metadata.sentiment !== undefined) {
-                    const sentiments = ['😊 Positive', '😐 Neutral', '😟 Negative'];
-                    const sentTag = document.createElement('span');
-                    sentTag.className = 'meta-tag';
-                    sentTag.textContent = sentiments[metadata.sentiment];
-                    metaDiv.appendChild(sentTag);
-                }
-                
-                if (metadata.source) {
-                    const sourceTag = document.createElement('span');
-                    sourceTag.className = 'meta-tag';
-                    sourceTag.textContent = metadata.source;
-                    metaDiv.appendChild(sourceTag);
-                }
-                
-                if (metadata.topic) {
-                    const topicTag = document.createElement('span');
-                    topicTag.className = 'meta-tag';
-                    topicTag.textContent = '📂 ' + metadata.topic;
-                    metaDiv.appendChild(topicTag);
-                }
-                
-                contentDiv.appendChild(metaDiv);
-            }
             
             messageDiv.appendChild(icon);
             messageDiv.appendChild(contentDiv);
@@ -582,7 +400,7 @@
             
             const icon = document.createElement('div');
             icon.className = 'message-icon';
-            icon.textContent = '🧠';
+            icon.textContent = '⚡';
             
             const contentDiv = document.createElement('div');
             contentDiv.className = 'message-content';
@@ -604,77 +422,81 @@
             if (typingDiv) typingDiv.remove();
         }
 
-        async function handleMessage(forceWiki = false) {
+        async function sendMessage() {
             const message = messageInput.value.trim();
+            
             if (!message || isLoading) return;
 
-            const topic = detectTopic(message);
+            if (!apiKey) {
+                alert('Please add your Groq API key first! Click the ⚙️ button above.');
+                settingsPanel.classList.add('active');
+                return;
+            }
+
             addMessage('user', message);
+            conversationHistory.push({
+                role: 'user',
+                content: message
+            });
             
             messageInput.value = '';
             isLoading = true;
             sendButton.disabled = true;
-            wikiButton.disabled = true;
-            webButton.disabled = true;
             showTyping();
 
-            const sentiment = await predictSentiment(message);
-            learnFromConversation(message, topic);
-            conversationHistory.push({ role: 'user', content: message, topic: topic, sentiment: sentiment });
+            try {
+                const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + apiKey,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: 'llama-3.1-8b-instant',
+                        messages: conversationHistory,
+                        temperature: 0.7,
+                        max_tokens: 1024
+                    })
+                });
 
-            let wikiData = null;
-            let source = '🧠 ML Analysis';
-            
-            if (forceWiki || message.toLowerCase().includes('who is') || message.toLowerCase().includes('what is')) {
-                wikiData = await searchWikipedia(message);
-                if (wikiData) {
-                    source = '📚 Wikipedia';
-                }
-            }
-
-            setTimeout(() => {
                 hideTyping();
-                const reply = generateResponse(message, sentiment, wikiData);
-                addMessage('assistant', reply, { 
-                    sentiment: sentiment, 
-                    source: source,
-                    topic: topic 
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error?.message || 'API request failed');
+                }
+
+                const data = await response.json();
+                const assistantMessage = data.choices[0].message.content;
+                
+                conversationHistory.push({
+                    role: 'assistant',
+                    content: assistantMessage
                 });
                 
-                conversationHistory.push({ role: 'assistant', content: reply });
-                
+                addMessage('assistant', assistantMessage);
+
+            } catch (error) {
+                hideTyping();
+                console.error('Error:', error);
+                addMessage('assistant', 'Error: ' + error.message + '\n\nPlease check your API key and try again. Get a free key at console.groq.com');
+            } finally {
                 isLoading = false;
                 sendButton.disabled = false;
-                wikiButton.disabled = false;
-                webButton.disabled = false;
                 messageInput.focus();
-            }, 1500);
+            }
         }
 
-        async function handleWikiSearch() {
-            const message = messageInput.value.trim();
-            if (!message) return;
-            
-            await handleMessage(true);
-        }
-
-        sendButton.addEventListener('click', () => handleMessage(false));
-        wikiButton.addEventListener('click', handleWikiSearch);
-        webButton.addEventListener('click', () => {
-            addMessage('assistant', '🔍 Web search is simulated in this demo. In a full implementation, this would search the internet using APIs. For now, try asking me questions and I\'ll use Wikipedia and my ML capabilities!');
-        });
+        sendButton.addEventListener('click', sendMessage);
         
-        messageInput.addEventListener('keypress', (e) => {
+        messageInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                handleMessage(false);
+                sendMessage();
             }
         });
 
-        createSentimentModel().then(() => {
-            console.log('Ultimate AI Chatbot ready!');
-            messageInput.focus();
-        });
+        messageInput.focus();
     </script>
 </body>
 </html>
