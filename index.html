@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Chatbot - Groq Powered</title>
+    <title>Dunah AI</title>
     <style>
         * {
             margin: 0;
@@ -16,8 +16,123 @@
             height: 100vh;
             background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #581c87 100%);
             display: flex;
-            flex-direction: column;
             overflow: hidden;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .code-panel {
+            width: 0;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border-left: 1px solid rgba(139, 92, 246, 0.3);
+            overflow: hidden;
+            transition: width 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .code-panel.active {
+            width: 500px;
+        }
+
+        .code-header {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 1rem;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .code-header h3 {
+            color: white;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .code-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .code-btn {
+            background: rgba(139, 92, 246, 0.2);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            color: #c4b5fd;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .code-btn:hover {
+            background: rgba(139, 92, 246, 0.3);
+        }
+
+        .code-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .code-block {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .code-block-header {
+            background: rgba(139, 92, 246, 0.1);
+            padding: 0.5rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        .code-lang {
+            color: #c4b5fd;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            color: #c4b5fd;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: rgba(139, 92, 246, 0.2);
+        }
+
+        .code-block pre {
+            margin: 0;
+            padding: 1rem;
+            color: #e0e7ff;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            overflow-x: auto;
+            white-space: pre;
         }
 
         .header {
@@ -292,59 +407,57 @@
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="header-content">
-            <div class="header-left">
-                <div class="bot-icon">⚡</div>
-                <div class="header-text">
-                    <h1>AI Chatbot</h1>
-                    <p>Powered by Groq (Fast & Free!)</p>
+    <div class="main-container">
+        <div class="header">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="bot-icon">⚡</div>
+                    <div class="header-text">
+                        <h1>AI Chatbot</h1>
+                        <p>Powered by Groq - Ready to Chat!</p>
+                    </div>
+                </div>
+                <button class="settings-btn" onclick="openCodePanel()">💻 Open Code Snippets</button>
+            </div>
+        </div>
+
+        <div class="messages-container" id="messagesContainer">
+            <div class="messages" id="messages">
+                <div class="message assistant">
+                    <div class="message-icon">⚡</div>
+                    <div class="message-content">Hello! I'm powered by Groq's lightning-fast AI and I'm ready to chat! Ask me anything or request code and it will appear in a popup panel on the right!</div>
                 </div>
             </div>
-            <button class="settings-btn" onclick="toggleSettings()">⚙️ API Key</button>
         </div>
-    </div>
 
-    <div class="settings-panel" id="settingsPanel">
-        <div class="settings-content">
-            <h3>⚡ Get Your Free Groq API Key</h3>
-            <p>
-                1. Go to <a href="https://console.groq.com" target="_blank">console.groq.com</a><br>
-                2. Sign up for free (no credit card needed!)<br>
-                3. Create an API key<br>
-                4. Paste it below
-            </p>
-            <div class="api-input-group">
-                <input type="password" id="apiKeyInput" placeholder="Enter your Groq API key (starts with gsk_...)">
-                <button onclick="saveApiKey()">Save & Start</button>
-            </div>
-            <p style="font-size: 0.75rem; margin-top: 0.5rem;">Your API key is stored locally in your browser only.</p>
-        </div>
-    </div>
-
-    <div class="messages-container" id="messagesContainer">
-        <div class="messages" id="messages">
-            <div class="message assistant">
-                <div class="message-icon">⚡</div>
-                <div class="message-content">Hello! I'm powered by Groq's lightning-fast AI. Click the "⚙️ API Key" button above to get started with your free API key from console.groq.com. No credit card required!</div>
+        <div class="input-container">
+            <div class="input-wrapper">
+                <input 
+                    type="text" 
+                    id="messageInput" 
+                    placeholder="Type your message..."
+                    autocomplete="off"
+                >
+                <button id="sendButton">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
             </div>
         </div>
     </div>
 
-    <div class="input-container">
-        <div class="input-wrapper">
-            <input 
-                type="text" 
-                id="messageInput" 
-                placeholder="Type your message..."
-                autocomplete="off"
-            >
-            <button id="sendButton">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="22" y1="2" x2="11" y2="13"></line>
-                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                </svg>
-            </button>
+    <div class="code-panel" id="codePanel">
+        <div class="code-header">
+            <h3>💻 Code Snippets</h3>
+            <div class="code-actions">
+                <button class="code-btn" onclick="clearCode()">Clear All</button>
+                <button class="code-btn" onclick="closeCodePanel()">✕ Close</button>
+            </div>
+        </div>
+        <div class="code-content" id="codeContent">
+            <p style="color: #9ca3af; text-align: center; padding: 2rem;">No code snippets yet. Ask me to write some code!</p>
         </div>
     </div>
 
@@ -353,28 +466,122 @@
         const messagesDiv = document.getElementById('messages');
         const messageInput = document.getElementById('messageInput');
         const sendButton = document.getElementById('sendButton');
-        const apiKeyInput = document.getElementById('apiKeyInput');
-        const settingsPanel = document.getElementById('settingsPanel');
+        const codePanel = document.getElementById('codePanel');
+        const codeContent = document.getElementById('codeContent');
 
         let isLoading = false;
-        let apiKey = '';
+        let apiKey = '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'; // Replace with your actual Groq API key
         let conversationHistory = [];
+        let codeSnippets = [];
 
-        function toggleSettings() {
-            settingsPanel.classList.toggle('active');
-        }
-
-        function saveApiKey() {
-            apiKey = apiKeyInput.value.trim();
-            if (apiKey) {
-                settingsPanel.classList.remove('active');
-                addMessage('assistant', 'Great! Your API key is saved. Now you can chat with me using Groq\'s powerful AI models. Ask me anything!');
-            } else {
-                alert('Please enter a valid API key');
+        // Load saved data on startup
+        function loadSavedData() {
+            const savedConversation = sessionStorage.getItem('conversation');
+            const savedCode = sessionStorage.getItem('codeSnippets');
+            
+            if (savedConversation) {
+                conversationHistory = JSON.parse(savedConversation);
+                const messages = conversationHistory.filter(m => m.role !== 'system');
+                messages.forEach(msg => {
+                    if (msg.displayText !== false) {
+                        addMessageToUI(msg.role, msg.content);
+                    }
+                });
+            }
+            
+            if (savedCode) {
+                codeSnippets = JSON.parse(savedCode);
+                if (codeSnippets.length > 0) {
+                    codeContent.innerHTML = '';
+                    codeSnippets.forEach(snippet => {
+                        addCodeToPanel(snippet.language, snippet.code, false);
+                    });
+                }
             }
         }
 
+        function saveData() {
+            sessionStorage.setItem('conversation', JSON.stringify(conversationHistory));
+            sessionStorage.setItem('codeSnippets', JSON.stringify(codeSnippets));
+        }
+
+        function extractCodeBlocks(text) {
+            const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
+            const blocks = [];
+            let match;
+            
+            while ((match = codeBlockRegex.exec(text)) !== null) {
+                blocks.push({
+                    language: match[1] || 'code',
+                    code: match[2].trim()
+                });
+            }
+            
+            return blocks;
+        }
+
+        function addCodeToPanel(language, code, shouldSave = true) {
+            if (codeSnippets.length === 0) {
+                codeContent.innerHTML = '';
+            }
+            
+            if (shouldSave) {
+                codeSnippets.push({ language, code });
+                saveData();
+            }
+            
+            const codeBlock = document.createElement('div');
+            codeBlock.className = 'code-block';
+            
+            const header = document.createElement('div');
+            header.className = 'code-block-header';
+            
+            const lang = document.createElement('span');
+            lang.className = 'code-lang';
+            lang.textContent = language.toUpperCase();
+            
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'copy-btn';
+            copyBtn.textContent = 'Copy';
+            copyBtn.onclick = function() {
+                navigator.clipboard.writeText(code);
+                copyBtn.textContent = '✓ Copied!';
+                setTimeout(() => copyBtn.textContent = 'Copy', 2000);
+            };
+            
+            header.appendChild(lang);
+            header.appendChild(copyBtn);
+            
+            const pre = document.createElement('pre');
+            pre.textContent = code;
+            
+            codeBlock.appendChild(header);
+            codeBlock.appendChild(pre);
+            codeContent.appendChild(codeBlock);
+            
+            codePanel.classList.add('active');
+        }
+
+        function closeCodePanel() {
+            codePanel.classList.remove('active');
+        }
+
+        function openCodePanel() {
+            codePanel.classList.add('active');
+        }
+
+        function clearCode() {
+            codeSnippets = [];
+            codeContent.innerHTML = '<p style="color: #9ca3af; text-align: center; padding: 2rem;">No code snippets yet. Ask me to write some code!</p>';
+            saveData();
+        }
+
         function addMessage(role, content) {
+            addMessageToUI(role, content);
+            saveData();
+        }
+
+        function addMessageToUI(role, content) {
             const messageDiv = document.createElement('div');
             messageDiv.className = 'message ' + role;
             
@@ -427,9 +634,8 @@
             
             if (!message || isLoading) return;
 
-            if (!apiKey) {
-                alert('Please add your Groq API key first! Click the ⚙️ button above.');
-                settingsPanel.classList.add('active');
+            if (!apiKey || apiKey === 'YOUR_GROQ_API_KEY_HERE') {
+                alert('Please replace YOUR_GROQ_API_KEY_HERE in the code with your actual Groq API key!');
                 return;
             }
 
@@ -452,10 +658,10 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        model: 'llama-3.1-8b-instant',
+                        model: 'llama-3.3-70b-versatile',
                         messages: conversationHistory,
                         temperature: 0.7,
-                        max_tokens: 1024
+                        max_tokens: 2048
                     })
                 });
 
@@ -474,12 +680,19 @@
                     content: assistantMessage
                 });
                 
+                const codeBlocks = extractCodeBlocks(assistantMessage);
+                if (codeBlocks.length > 0) {
+                    codeBlocks.forEach(block => {
+                        addCodeToPanel(block.language, block.code);
+                    });
+                }
+                
                 addMessage('assistant', assistantMessage);
 
             } catch (error) {
                 hideTyping();
                 console.error('Error:', error);
-                addMessage('assistant', 'Error: ' + error.message + '\n\nPlease check your API key and try again. Get a free key at console.groq.com');
+                addMessage('assistant', 'Error: ' + error.message + '\n\nPlease check your API key and try again.');
             } finally {
                 isLoading = false;
                 sendButton.disabled = false;
@@ -496,6 +709,8 @@
             }
         });
 
+        // Load saved data when page loads
+        loadSavedData();
         messageInput.focus();
     </script>
 </body>
